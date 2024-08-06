@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, #f4f4f4, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .hangman-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .word-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .letter {
+            font-size: 2rem;
+            padding: 0 15px;
+            border-bottom: 3px solid #333;
+            margin-right: 5px;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .letter:hover {
+            color: #007bff;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background-color: #0a036b;
+            transform: scale(1.05);
+        }
+
+        .wrong-guesses {
+            margin-bottom: 20px;
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+
+        .game-over {
+            margin-top: 20px;
+        }
+
+        .game-over h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .play-again {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 18px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .play-again:hover {
+            background-color: #010a14;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hangman Game</h1>
+        <div class="hangman-container">
+            <div class="hangman">
+                <!-- Hangman drawing will go here -->
+            </div>
+            <div class="word-container">
+                {% for letter in word_display %}
+                    <span class="letter">{{ letter }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="input-container">
+            <form id="guess-form" method="POST" action="{% url 'guess_letter' %}">
+                {% csrf_token %}
+                <input id="letter-input" type="text" name="letter" maxlength="1" required>
+                <button type="submit">Guess</button>
+            </form>
+        </div>
+        <div class="wrong-guesses">
+            <p>Wrong guesses: {{ wrong_guesses }}</p>
+        </div>
+        {% if is_game_over %}
+            <div class="game-over">
+                <h2>{{ game_message }}</h2>
+                <a href="{% url 'new_game' %}" class="play-again">Play Again</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('letter-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form from submitting the default way
+                const form = document.getElementById('guess-form');
+                form.submit(); // Submit the form programmatically
+                // Re-focus the input field to keep the cursor in place
+                setTimeout(() => document.getElementById('letter-input').focus(), 0);
+            }
+        });
+    </script>
+</body>
+</html>
